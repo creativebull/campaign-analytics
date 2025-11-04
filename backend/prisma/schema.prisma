@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  apiKey    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  events          Event[]
+  experiments     Experiment[]
+  userAssignments UserAssignment[]
+
+  @@map("tenants")
+}
+
+model Experiment {
+  id          String            @id @default(uuid())
+  tenantId    String
+  name        String
+  description String?
+  status      ExperimentStatus  @default(DRAFT)
+  variants    Json              // Array of variant configurations
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  events          Event[]
+  userAssignments UserAssignment[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([startDate, endDate])
+  @@map("experiments")
+}
+
+enum ExperimentStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+}
+
+model UserAssignment {
+  id           String   @id @default(uuid())
+  tenantId     String
+  experimentId String
+  userId       String
+  variant      String
+  assignedAt   DateTime @default(now())
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  experiment Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, experimentId, userId])
+  @@index([tenantId, experimentId])
+  @@index([userId])
+  @@map("user_assignments")
+}
+
+model Event {
+  id           String    @id @default(uuid())
+  tenantId     String
+  userId       String
+  eventType    EventType
+  experimentId String?
+  variant      String?
+  properties   Json?
+  timestamp    DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  experiment Experiment? @relation(fields: [experimentId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, timestamp])
+  @@index([tenantId, experimentId, timestamp])
+  @@index([tenantId, eventType, timestamp])
+  @@index([tenantId, userId])
+  @@map("events")
+}
+
+enum EventType {
+  PAGE_VIEW
+  CLICK
+  CONVERSION
+}
