@@ -8,13 +8,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiSecurity,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 import { ExperimentsService } from './experiments.service';
 import { CreateExperimentDto } from './dto/create-experiment.dto';
 import { TenantGuard } from '../common/guards/tenant.guard';
@@ -23,7 +17,6 @@ import { Tenant } from '../common/decorators/tenant.decorator';
 @ApiTags('Experiments')
 @Controller('experiments')
 @UseGuards(TenantGuard)
-@ApiBearerAuth()
 @ApiSecurity('api-key')
 export class ExperimentsController {
   constructor(private readonly experimentsService: ExperimentsService) {}
@@ -33,10 +26,7 @@ export class ExperimentsController {
   @ApiOperation({ summary: 'Create A/B test configuration' })
   @ApiResponse({ status: 201, description: 'Experiment created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid experiment data' })
-  async create(
-    @Tenant() tenant: any,
-    @Body() createExperimentDto: CreateExperimentDto,
-  ) {
+  async create(@Tenant() tenant: any, @Body() createExperimentDto: CreateExperimentDto) {
     return this.experimentsService.create(tenant.id, createExperimentDto);
   }
 

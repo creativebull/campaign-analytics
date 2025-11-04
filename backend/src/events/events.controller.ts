@@ -1,18 +1,5 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiSecurity,
-} from '@nestjs/swagger';
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -22,7 +9,6 @@ import { Tenant } from '../common/decorators/tenant.decorator';
 @ApiTags('Events')
 @Controller('events')
 @UseGuards(TenantGuard)
-@ApiBearerAuth()
 @ApiSecurity('api-key')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}

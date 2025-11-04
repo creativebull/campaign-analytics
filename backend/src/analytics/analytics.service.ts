@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AnalyticsQueryDto } from './dto/analytics-query.dto';
 
-interface VariantMetrics {
+export interface VariantMetrics {
   events: number;
   users: number;
   conversions: number;
   conversionRate: number;
 }
 
-interface AnalyticsSummary {
+export interface AnalyticsSummary {
   totalEvents: number;
   uniqueUsers: number;
   variants: Record<string, VariantMetrics>;
@@ -19,10 +19,7 @@ interface AnalyticsSummary {
 export class AnalyticsService {
   constructor(private prisma: PrismaService) {}
 
-  async getSummary(
-    tenantId: string,
-    query: AnalyticsQueryDto,
-  ): Promise<AnalyticsSummary> {
+  async getSummary(tenantId: string, query: AnalyticsQueryDto): Promise<AnalyticsSummary> {
     const { startDate, endDate, experimentId } = query;
 
     // Build date filter
@@ -88,9 +85,7 @@ export class AnalyticsService {
       const variantData = variants[variant] as any;
       variantData.users = variantData.users.size;
       variantData.conversionRate =
-        variantData.users > 0
-          ? variantData.conversions / variantData.users
-          : 0;
+        variantData.users > 0 ? variantData.conversions / variantData.users : 0;
     });
 
     const result: AnalyticsSummary = {
