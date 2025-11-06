@@ -10,7 +10,12 @@ import { useToast } from '@/contexts/toast-context'
 import type { ExperimentTableRow, SortColumn, SortDirection, ExperimentStatus } from '@/types'
 import { cn } from '@/lib/utils'
 
-export function ExperimentsTable() {
+interface ExperimentsTableProps {
+  onRowClick?: (experimentId: string) => void
+  onRowsChange?: (rows: ExperimentTableRow[]) => void
+}
+
+export function ExperimentsTable({ onRowClick, onRowsChange }: ExperimentsTableProps) {
   const { success, error: showError } = useToast()
   const [rows, setRows] = useState<ExperimentTableRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -112,6 +117,7 @@ export function ExperimentsTable() {
       }
       
       setRows(tableRows)
+      onRowsChange?.(tableRows)
       success('Data loaded successfully')
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch data'
@@ -250,13 +256,13 @@ export function ExperimentsTable() {
       success(`Successfully marked ${experimentIds.length} experiment(s) as completed`)
       
       // Update local state
-      setRows((prevRows) =>
-        prevRows.map((row) =>
-          selectedRows.has(row.experimentId)
-            ? { ...row, status: 'COMPLETED' as ExperimentStatus }
-            : row
-        )
+      const updatedRows = rows.map((row) =>
+        selectedRows.has(row.experimentId)
+          ? { ...row, status: 'COMPLETED' as ExperimentStatus }
+          : row
       )
+      setRows(updatedRows)
+      onRowsChange?.(updatedRows)
       
       // Clear selection
       setSelectedRows(new Set())
@@ -462,8 +468,16 @@ export function ExperimentsTable() {
                         )}
                       </button>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                      {row.experimentName}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onRowClick?.(row.experimentId)
+                        }}
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline cursor-pointer"
+                      >
+                        {row.experimentName}
+                      </button>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {row.variant}

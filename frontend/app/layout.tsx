@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { ThemeProvider } from '@/contexts/theme-context'
-import { ToastProvider } from '@/contexts/toast-context'
-import { ToastContainer } from '@/components/toast/toast-container'
+import { Providers } from '@/components/providers'
 
 export const metadata: Metadata = {
   title: 'Campaign Analytics Dashboard',
@@ -17,12 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider>
-          <ToastProvider>
-            {children}
-            <ToastContainer />
-          </ToastProvider>
-        </ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

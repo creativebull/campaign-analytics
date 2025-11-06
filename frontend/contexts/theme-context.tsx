@@ -49,11 +49,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'))
   }
 
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return <>{children}</>
-  }
-
+  // Always provide the context, even before mounted to prevent errors
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}
