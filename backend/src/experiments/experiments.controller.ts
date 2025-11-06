@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   UseGuards,
@@ -11,6 +12,7 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 import { ExperimentsService } from './experiments.service';
 import { CreateExperimentDto } from './dto/create-experiment.dto';
+import { UpdateExperimentDto } from './dto/update-experiment.dto';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { Tenant } from '../common/decorators/tenant.decorator';
 
@@ -49,5 +51,20 @@ export class ExperimentsController {
   @ApiResponse({ status: 404, description: 'Experiment not found' })
   async findOne(@Tenant() tenant: any, @Param('id') id: string) {
     return this.experimentsService.findOne(tenant.id, id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update experiment' })
+  @ApiResponse({
+    status: 200,
+    description: 'Experiment updated successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Experiment not found' })
+  async update(
+    @Tenant() tenant: any,
+    @Param('id') id: string,
+    @Body() updateExperimentDto: UpdateExperimentDto,
+  ) {
+    return this.experimentsService.update(tenant.id, id, updateExperimentDto);
   }
 }

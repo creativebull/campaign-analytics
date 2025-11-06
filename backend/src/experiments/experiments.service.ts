@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateExperimentDto } from './dto/create-experiment.dto';
+import { UpdateExperimentDto } from './dto/update-experiment.dto';
 
 @Injectable()
 export class ExperimentsService {
@@ -45,5 +46,20 @@ export class ExperimentsService {
     }
 
     return experiment;
+  }
+
+  async update(tenantId: string, id: string, updateExperimentDto: UpdateExperimentDto) {
+    const experiment = await this.prisma.experiment.findFirst({
+      where: { id, tenantId },
+    });
+
+    if (!experiment) {
+      throw new NotFoundException(`Experiment with ID ${id} not found`);
+    }
+
+    return this.prisma.experiment.update({
+      where: { id },
+      data: updateExperimentDto,
+    });
   }
 }

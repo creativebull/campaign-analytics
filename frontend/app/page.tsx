@@ -1,4 +1,5 @@
 import { ThemeToggle } from '@/components/theme-toggle'
+import { ExperimentsTable } from '@/components/dashboard/experiments-table'
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
           </h1>
           <ThemeToggle />
         </div>
+        <ExperimentsTable />
       </div>
     </main>
   )
